@@ -1,0 +1,103 @@
+
+  body,html {
+    background-color: rgb(65, 177, 221);
+    
+    justify-content: center;
+  }
+
+ /* 
+  * Main page main container
+  */
+
+  #mainPageMainContainer {
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   
+   }
+
+  #upperDiv {
+    display: flex;
+    justify-content: center;
+    width:100%;
+  }
+ 
+  #tbilisiDiv {
+    display: none;
+    flex-wrap: wrap;
+  }
+  
+  #kutaisiDiv {
+    display: none;
+    flex-wrap: wrap;
+  }
+  #batumiDiv {
+    display: none;
+    flex-wrap: wrap;
+   
+  }
+  .sevenDayDiv {
+    border:solid white;
+    border-color:rgb(243, 219, 114);
+    border-radius: 20px;
+    border-top:none; 
+    justify-content: center;
+    width:70%;
+   
+  }
+  .cityBox {
+    border: solid white;
+    margin :10px;
+    padding:10px;
+    border-radius: 20px;
+    /* margin-bottom: 5%; */
+    width: 20%;
+  }
+  .cityBox:hover li:not(.showMore):not(.showLess) {
+    color:rgb(243, 219, 114);
+   
+  }
+  .cityBox:hover {
+    border-color:rgb(243, 219, 114);
+
+  }
+  ul {
+    margin :0px;
+    padding:0px;
+  }
+  .cityBox li {
+    list-style-type: none;
+    margin:10px;
+    color:white;
+  }
+
+  .lowerCityBox{
+    border: solid white;
+    border-color:rgb(243, 219, 114);
+    margin :10px;
+    padding:10px;
+    border-radius: 20px;
+  }
+  .lowerCityBox li {
+    list-style-type: none;
+    color:white;
+  }
+  
+  .showMore{
+    
+    cursor:pointer;
+    background-color:rgba(255, 255, 255, 0.39);
+    padding: 10px;
+  }
+
+  .showLess{
+    
+    cursor:pointer;
+    background-color:rgba(255, 255, 255, 0.39);
+    padding: 10px;
+  }
+
+* {
+  font-family: 'Helvetica';
+}

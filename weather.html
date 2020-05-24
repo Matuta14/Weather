@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+    
+    </style>
+    <head>
+        <title> weather</title>
+     </head>
+
+    <body>
+    <div id = "mainPageMainContainer">
+        <div id = "upperDiv"> </div>
+        <div id = "tbilisiDiv" class = "sevenDayDiv"> </div>
+        <div id = "batumiDiv" class = "sevenDayDiv"> </div>
+        <div id = "kutaisiDiv" class = "sevenDayDiv"> </div>
+    <div>
+    </body>
+    <script>
+        
+        const APIKey = "71322f4daae83aa59e26de4f72796bcd";
+        var cities = [ "Tbilisi","Kutaisi", "Batumi"];
+
+        //Create main city boxes (Tbilisi, Kutaisi, Batumi);
+        for(var i = 0; i < cities.length; i++){
+            var request = new XMLHttpRequest(); 
+            var APILink = "http://api.openweathermap.org/data/2.5/weather?q=" + cities[i] + 
+                            "&appid=" + APIKey + "&units=metric";
+            
+            request.open('GET', APILink, true);
+            request.send();  
+            request.onload = function() {
+
+                // Begin accessing JSON data here
+                var data = JSON.parse(this.response)
+
+                //Create city boxes
+                createCity(data);      
+
+                //Create seven day forecast boxes for given city
+                create7dayDiv(data.coord["lon"], data.coord["lat"], data.name);       
+            }        
+        }
+      
+        //Create main city box
+        function createCity(data){
+
+            
+            var div  = document.createElement("div");
+            changeDivStyle(div, data);
+
+            var ul = document.createElement("ul");
+
+            var img = document.createElement("img");
+            changeImgStyle(img, ul, data);
+
+            createElement(data.name, ul, "40px");
+
+            var date = new Date();
+            var weekday = new Array(7);
+            makeWeekdayArray(weekday);
+            var today = weekday[date.getDay()];
+            console.log(date.getDay());
+            createElement(today, ul, "15px");
+
+            createMainCityElements(data, ul, div);
+            
+            createShowMoreBtn(ul, data);
+            createShowLessBtn(ul, data);
+
+            div.appendChild(ul);
+            
+            document.getElementById("upperDiv").appendChild(div);
+
+                
+        }
+
+        function makeWeekdayArray(weekday){
+            weekday[0] = "Sunday";
+            weekday[1] = "Monday";
+            weekday[2] = "Tuesday";
+            weekday[3] = "Wednesday";
+            weekday[4] = "Thursday";
+            weekday[5] = "Friday";
+            weekday[6] = "Saturday";
+        }
+
+        function changeDivStyle(div, data){
+            div.className = "cityBox";
+            var cityBoxId = data.name + "Id";
+            div.id = cityBoxId;
+        }
+
+        function changeImgStyle(img, ul, data){
+            var url = " http://openweathermap.org/img/wn/" + data.weather[0]["icon"] + "@2x.png";
+            img.src = url;
+            ul.appendChild(img);
+        }
+        
+        function createShowMoreBtn(ul, data){
+            var showMore = document.createElement("li");
+            showMore.innerHTML = "See 7 day forecast...";
+            var id = "showMoreBtn" + data.name;
+            showMore.id = id;
+            showMore.className = "showMore";
+            showMore.onclick = function() {showMoreFun(data.coord["lon"], data.coord["lat"], data.name)};
+            ul.appendChild(showMore);
+        }
+
+        function createShowLessBtn(ul, data){
+            var showLess = document.createElement("li");
+            showLess.innerHTML = "Show less";
+            var id = "showLessBtn" + data.name;
+            showLess.id = id;
+            showLess.className = "showLess";
+            showLess.onclick = function() {showLessFun(data.coord["lon"], data.coord["lat"], data.name)};
+            showLess.style.display = "none";
+            ul.appendChild(showLess);
+        }
+
+        // Cretae lower city boxes for seven days forecats of given city
+        function create7dayDiv(lon, lat, city){
+    
+            var request = new XMLHttpRequest()
+            
+            var APILink = " https://api.openweathermap.org/data/2.5/onecall?lat="  + lat + 
+                "&lon=" + lon + "&exclude=hourly,current,minutely&appid=71322f4daae83aa59e26de4f72796bcd&units=metric";
+            request.open('GET', APILink, true);
+            request.send();
+            request.onload = function() {
+                    
+                var data = JSON.parse(this.response);               
+                var daily = data.daily;
+                console.log(daily);
+
+           
+                for(var i = 1; i < daily.length; i++){
+                    var div = document.createElement("div");
+                    div.className = "lowerCityBox";
+                    var ul = document.createElement("ul");
+                   
+                    
+                    createLowerCityElements(daily[i], ul, div, i);
+                    
+                    div.appendChild(ul);
+                    var divName = city.toLowerCase() + "Div";
+                    document.getElementById(divName).appendChild(div);
+
+                } 
+            }
+        }
+
+        function createMainCityElements(data, ul, div, i){
+      
+            var defFont = "15px";
+            createElement(data.main["temp"] + "&#8451", ul, "40px");
+            createElement(data.weather[0]["description"], ul, "25px");
+            createElement("Feels like: " + data.main["feels_like"] + "&#8451", ul, defFont);
+            createElement("Main: " + data.weather[0]["main"], ul, defFont);
+            createElement("Minimal temperature: " + data.main["temp_min"] + "&#8451", ul, defFont);
+            createElement("Maximal temperature: " + data.main["temp_max"] + "&#8451", ul, defFont);
+            createElement("Wind speed: " + data.wind["speed"], ul, defFont);
+        
+       
+       }
+
+       //Create elements with given information in
+       function createLowerCityElements(daily, ul, div, i){
+            var date = new Date();
+            var defFont = "15px";
+            var weekday = new Array(7);
+            makeWeekdayArray(weekday);
+            var day = "";
+            var dayInd = date.getDay() + i;
+             
+            if(dayInd % 6 > 0){
+                day = weekday[dayInd % 6 - 1]
+            } else day = weekday[6];
+           
+            createElement(daily["temp"]["day"] + "&#8451", ul, "25px");
+            createElement(daily.weather[0]["description"], ul, "20px");
+            createElement(day, ul, "20px");
+            createElement( "Feels like: " + daily["feels_like"]["day"]+ "&#8451", ul, defFont);
+            createElement("Main: " + daily.weather[0]["main"], ul, defFont);
+            createElement( "Minimal temperature: " + daily.temp["min"] + "&#8451", ul, defFont);
+            createElement("Maximal temperature: " + daily.temp["max"] + "&#8451", ul, defFont);
+            createElement( "Wind speed: " + daily.wind_speed, ul, defFont);
+
+        }
+        function createElement(str, ul, font){
+            var element = document.createElement("li");
+            element.innerHTML = str;
+            element.style.fontSize = font;
+            ul.appendChild(element);
+        }
+
+        //Show more function that shows the seven day forecast of given city
+        function showMoreFun(lon, lat, city){
+
+            
+            // Hide other cities's 7 days forecast divs
+            hideCitiesDivs();
+          
+            //Make visible other "showMore" buttons
+            visibleShowMoreBtns();
+           
+            //Hide other "showLess" buttons
+            hideShowLessBtns();
+
+            var id = "showMoreBtn" + city;
+            document.getElementById(id).style.display = "none";
+
+            id = "showLessBtn" + city;
+            document.getElementById(id).style.display = "block";
+            
+            var divName = city.toLowerCase() + "Div";
+            document.getElementById(divName).style.display = "flex";
+            
+            changeCityBoxStyle(city);
+           
+            scroll();
+        }       
+
+        function scroll(){
+            window.scrollTo(0,500);
+        }
+
+        function changeCityBoxStyle(city){
+            var cityBoxId = city + "Id";
+            var cityBox =  document.getElementById(cityBoxId);
+            cityBox.style.borderBottom = "none";
+            cityBox.style.borderColor = "rgb(243, 219, 114)";
+            cityBox.color = "rgb(243, 219, 114)";
+        }
+
+        function hideCitiesDivs(){
+            for(var i = 0; i < cities.length; i++){
+                var divName = cities[i].toLowerCase() + "Div";
+                document.getElementById(divName).style.display = "none";  
+                
+                //Make other city boxes' border solid
+                var cityBoxId = cities[i] + "Id";
+                document.getElementById(cityBoxId).style.border = "solid white";  
+            }   
+
+        }
+
+        function visibleShowMoreBtns(){
+            var showMoreBtns = document.getElementsByClassName("showMore");
+            for(var i = 0; i < showMoreBtns.length; i++){
+                showMoreBtns[i].style.display = "block";
+            }
+        }
+
+        function hideShowLessBtns(){
+            var showLessBtns = document.getElementsByClassName("showLess");
+            for(var i = 0; i < showLessBtns.length; i++){
+                showLessBtns[i].style.display = "none";
+            }
+        }
+        //Show less function that hides the visible seven day forecast of given city
+        function showLessFun(lon, lat, city){
+
+            var id = "showMoreBtn" + city;
+            document.getElementById(id).style.display = "block";
+
+            id = "showLessBtn" + city;
+            document.getElementById(id).style.display = "none";
+
+            var divName = city.toLowerCase() + "Div";
+            document.getElementById(divName).style.display = "none";
+
+            var cityBoxId = city + "Id";
+            document.getElementById(cityBoxId).style.border = "solid white";  
+        }
+                    
+    </script>
+</html>
